@@ -13,6 +13,6 @@ const RightSide = () => {
 export default RightSide
 
 const Container = styled.div`
-  grid-area: Rightside;
+  grid-area: rightside;
 `
 
