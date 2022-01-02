@@ -276,9 +276,16 @@ const SocialCounts = styled.ul`
   padding: 8px 0;
   border-bottom: 1px solid #e9e5df;
   list-style: none;
+
+  a {
+    text-decoration: none;
+    color: black;
+  }
+
   li {
     margin-right: 5px;
     font-size: 12px;
+
     button {
       display: flex;
       border: none;
