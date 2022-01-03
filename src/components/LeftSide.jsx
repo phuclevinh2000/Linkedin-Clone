@@ -1,9 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 
-const LeftSide = () => {
+const LeftSide = (props) => {
   return (
     <Container>
       <ArtCard>
@@ -11,7 +12,9 @@ const LeftSide = () => {
           <CardBackground />
           <Link to=''>
             <Photo />
-            <LinkText>Welcome, there!</LinkText>
+            <LinkText>
+              Welcome, {props.user ? props.user.displayName : ''}!
+            </LinkText>
           </Link>
           <Link to=''>
             <AddPhotoText>Add a photo</AddPhotoText>
@@ -57,7 +60,13 @@ const LeftSide = () => {
   );
 };
 
-export default LeftSide;
+const mapStateToProps = (state) => {
+  return {
+    user: state.userState.user,
+  };
+};
+
+export default connect(mapStateToProps)(LeftSide);
 
 const Container = styled.div`
   grid-area: leftside;
@@ -193,13 +202,13 @@ const CommunityCard = styled(ArtCard)`
   display: flex;
   flex-direction: column;
 
-  a{
+  a {
     color: black;
     padding: 4px 12px 4px 12px;
     font-size: 12px;
 
     &:hover {
-      color: #0a66c2
+      color: #0a66c2;
     }
 
     span {
@@ -209,13 +218,13 @@ const CommunityCard = styled(ArtCard)`
     }
 
     &:last-child {
-      color: rgba(0,0,0,0.6);
+      color: rgba(0, 0, 0, 0.6);
 
       border-top: 1px solid #d6cec2;
       padding: 12px;
       &:hover {
-        background-color: rgba(0,0,0,0.08);
+        background-color: rgba(0, 0, 0, 0.08);
       }
     }
   }
-`
+`;

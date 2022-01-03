@@ -15,6 +15,7 @@ import {
   MdEventAvailable,
   MdArticle,
 } from 'react-icons/md';
+import PostModal from './PostModal';
 
 const Main = () => {
   return (
@@ -105,6 +106,7 @@ const Main = () => {
           </SocialActions>
         </Article>
       </div>
+      <PostModal />
     </Container>
   );
 };

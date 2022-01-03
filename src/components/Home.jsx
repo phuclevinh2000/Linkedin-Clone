@@ -1,14 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
+import { connect } from 'react-redux';
 
 import styled from 'styled-components';
 import LeftSide from './LeftSide';
 import Main from './Main';
 import RightSide from './RightSide';
 
-const Home = () => {
+const Home = (props) => {
   return (
     <Container>
+      {!props.user && <Navigate to='/' />}
       <Section>
         <h5>
           <Link to=''>Hiring in a hurry? &nbsp;</Link>
@@ -27,7 +29,13 @@ const Home = () => {
   );
 };
 
-export default Home;
+const mapStateToProps = (state) => {
+  return {
+    user: state.userState.user,
+  };
+};
+
+export default connect(mapStateToProps)(Home);
 
 const Container = styled.div`
   padding-top: 52px;
@@ -70,7 +78,7 @@ const Section = styled.div`
 
 const Layout = styled.div`
   display: grid;
-  grid-template-areas: "leftside main rightside";
+  grid-template-areas: 'leftside main rightside';
   grid-template-columns: minmax(0, 5fr) minmax(0, 12fr) minmax(300px, 7fr);
   column-gap: 25px;
   row-gap: 25px;
@@ -82,4 +90,4 @@ const Layout = styled.div`
     flex-direction: column;
     padding: 0 5px;
   }
-`
+`;

@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 
 import styled from 'styled-components';
 import { AiOutlineSearch } from 'react-icons/ai';
+import { connect } from 'react-redux';
+import { signOutAPI } from '../redux/actions';
 
-const Header = () => {
+const Header = (props) => {
   return (
     <Container>
       <Content>
@@ -60,14 +62,16 @@ const Header = () => {
 
             <User>
               <Link to='/user'>
-                <img src='/images/user.svg' alt='' />
+                {props.user && props.user.photoURL ? (
+                  <img src={props.user.photoURL} alt='' />
+                ) : (
+                  <img src='/images/user.svg' alt='' />
+                )}
                 <span>Me</span>
                 <img src='/images/down-icon.svg' alt='' />
               </Link>
-              <SignOut>
-                <Link to="/">
-                  Sign Out
-                </Link>
+              <SignOut onClick={() => props.SignOut()}>
+                <Link to='/'>Sign Out</Link>
               </SignOut>
             </User>
 
@@ -87,7 +91,17 @@ const Header = () => {
   );
 };
 
-export default Header;
+const mapStateToProps = (state) => {
+  return {
+    user: state.userState.user,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => ({
+  SignOut: () => dispatch(signOutAPI()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header);
 
 const Container = styled.div`
   background-color: white;
@@ -243,7 +257,7 @@ const SignOut = styled.div`
     text-decoration: none;
     color: rgba(0, 0, 0, 0.9);
   }
-`
+`;
 
 const User = styled(NavList)`
   svg {
@@ -252,7 +266,7 @@ const User = styled(NavList)`
   }
 
   a > img {
-    width: 24px;                        
+    width: 24px;
     height: 24px;
     border-radius: 50%;
   }
@@ -274,4 +288,3 @@ const User = styled(NavList)`
 const Work = styled(User)`
   border-left: 1px solid rgba(0, 0, 0, 0.08);
 `;
-
