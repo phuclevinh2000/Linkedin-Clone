@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
@@ -18,13 +18,33 @@ import {
 import PostModal from './PostModal';
 
 const Main = () => {
+  const [showModal, setShowModal] = useState('close');
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    if (e.target !== e.currentTarget) {
+      return;
+    }
+
+    switch (showModal) {
+      case 'open':
+        setShowModal('close');
+        break;
+      case 'close':
+        setShowModal('open');
+        break;
+      default:
+        setShowModal('close');
+        break;
+    }
+  };
   return (
     <Container>
       <ShareBox>
         Share
         <div>
           <img className='user-image' src='images/user.svg' alt='' />
-          <button>Start a post</button>
+          <button onClick={handleClick}>Start a post</button>
         </div>
         <div>
           <button>
@@ -106,7 +126,7 @@ const Main = () => {
           </SocialActions>
         </Article>
       </div>
-      <PostModal />
+      <PostModal showModal={showModal} handleClick={handleClick} />
     </Container>
   );
 };
