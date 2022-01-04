@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { BsThreeDots } from 'react-icons/bs';
+
 import {
   AiOutlineLike,
   AiOutlineComment,
@@ -16,9 +16,18 @@ import {
   MdArticle,
 } from 'react-icons/md';
 import PostModal from './PostModal';
+import { connect } from 'react-redux';
+import { getArticleAPI } from '../redux/actions';
+import ReactPlayer from 'react-player';
+import DeletePopUp from './DeletePopUp';
 
-const Main = () => {
+const Main = (props) => {
   const [showModal, setShowModal] = useState('close');
+
+  useEffect(() => {
+    props.getArticles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -39,99 +48,136 @@ const Main = () => {
     }
   };
   return (
-    <Container>
-      <ShareBox>
-        Share
-        <div>
-          <img className='user-image' src='images/user.svg' alt='' />
-          <button onClick={handleClick}>Start a post</button>
-        </div>
-        <div>
-          <button>
-            <MdInsertPhoto size={24} className='icon' />
-            <span>Photo</span>
-          </button>
-
-          <button>
-            <MdFeaturedVideo size={24} className='icon' />
-            <span>Video</span>
-          </button>
-
-          <button>
-            <MdEventAvailable size={24} className='icon' />
-            <span>Event</span>
-          </button>
-
-          <button>
-            <MdArticle size={24} className='icon' />
-            <span>Write article</span>
-          </button>
-        </div>
-      </ShareBox>
-      <div>
-        <Article>
-          <SharedActor>
-            <Link to=''>
-              <img src='/images/user.svg' alt='' />
-              <div>
-                <span>Title</span>
-                <span>Info</span>
-                <span>Date</span>
-              </div>
-            </Link>
-            <button>
-              <BsThreeDots size={24} />
-            </button>
-          </SharedActor>
-
-          <Description>Description</Description>
-
-          <SharedImg>
-            <Link to=''>
-              <img src='/images/shared-image.jfif' alt='' />
-            </Link>
-          </SharedImg>
-
-          <SocialCounts>
-            <li>
-              <button>
-                <img src='/images/like-icon.png' alt='' />
-                <img src='/images/clap-icon.png' alt='' />
-                <span>75</span>
+    <>
+      {props.articles.length === 0 ? (
+        <p>There are no articles</p>
+      ) : (
+        <Container>
+          <ShareBox>
+            <div>
+              {props.user && props.user.photoURL ? (
+                <img src={props.user.photoURL} alt='' />
+              ) : (
+                <img className='user-image' src='images/user.svg' alt='' />
+              )}
+              <button
+                onClick={handleClick}
+                disabled={props.loading ? true : false}
+              >
+                Start a post
               </button>
-            </li>
+            </div>
+            <div>
+              <button>
+                <MdInsertPhoto size={24} className='icon' />
+                <span>Photo</span>
+              </button>
 
-            <li>
-              <Link to=''>2 comments</Link>
-            </li>
-          </SocialCounts>
+              <button>
+                <MdFeaturedVideo size={24} className='icon' />
+                <span>Video</span>
+              </button>
 
-          <SocialActions>
-            <button>
-              <AiOutlineLike className='icon' />
-              <span>Like</span>
-            </button>
-            <button>
-              <AiOutlineComment className='icon' />
-              <span>Comments</span>
-            </button>
-            <button>
-              <AiOutlineShareAlt className='icon' />
-              <span>Share</span>
-            </button>
-            <button>
-              <AiOutlineSend className='icon' />
-              <span>Send</span>
-            </button>
-          </SocialActions>
-        </Article>
-      </div>
-      <PostModal showModal={showModal} handleClick={handleClick} />
-    </Container>
+              <button>
+                <MdEventAvailable size={24} className='icon' />
+                <span>Event</span>
+              </button>
+
+              <button>
+                <MdArticle size={24} className='icon' />
+                <span>Write article</span>
+              </button>
+            </div>
+          </ShareBox>
+          <Content>
+            {props.loading && <img src='/images/spin-loading.gif' alt='' />}
+            {props.articles.map((article, key) => (
+              <Article key={key}>
+                <SharedActor>
+                  <Link to=''>
+                    <img src={article.actor.image} alt='' />
+                    <div>
+                      <span>{article.actor.title}</span>
+                      <span>{article.actor.description}</span>
+                      <span>
+                        {article.actor.date.toDate().toLocaleDateString()}
+                      </span>
+                    </div>
+                  </Link>
+                  <div>
+                    <DeletePopUp />
+                  </div>
+                </SharedActor>
+
+                <Description>{article.description}</Description>
+
+                <SharedImg>
+                  <Link to=''>
+                    {!article.sharedImg && article.video ? (
+                      <ReactPlayer width={'100%'} url={article.video} />
+                    ) : article.sharedImg && !article.video ? (
+                      <img src={article.sharedImg} alt='' />
+                    ) : (
+                      <></>
+                    )}
+                  </Link>
+                </SharedImg>
+
+                <SocialCounts>
+                  <li>
+                    <button>
+                      <img src='/images/like-icon.png' alt='' />
+                      <img src='/images/clap-icon.png' alt='' />
+                      <span>75</span>
+                    </button>
+                  </li>
+
+                  <li>
+                    <Link to=''>{article.comments}</Link>
+                  </li>
+                </SocialCounts>
+
+                <SocialActions>
+                  <button>
+                    <AiOutlineLike className='icon' />
+                    <span>Like</span>
+                  </button>
+                  <button>
+                    <AiOutlineComment className='icon' />
+                    <span>Comments</span>
+                  </button>
+                  <button>
+                    <AiOutlineShareAlt className='icon' />
+                    <span>Share</span>
+                  </button>
+                  <button>
+                    <AiOutlineSend className='icon' />
+                    <span>Send</span>
+                  </button>
+                </SocialActions>
+              </Article>
+            ))}
+          </Content>
+          <PostModal showModal={showModal} handleClick={handleClick} />
+        </Container>
+      )}
+    </>
   );
 };
 
-export default Main;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.articleState.loading,
+    user: state.userState.user,
+    articles: state.articleState.articles,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => ({
+  getArticles: () => dispatch(getArticleAPI()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);
 
 const Container = styled.div`
   grid-area: main;
@@ -267,6 +313,14 @@ const SharedActor = styled.div`
     border: none;
     outline: none;
   }
+
+  p {
+    font-size: 11px;
+    background: #f36b6b;
+    padding: 3px 20px;
+    color: white;
+    border-radius: 5px;
+  }
 `;
 
 const Description = styled.div`
@@ -282,7 +336,7 @@ const SharedImg = styled.div`
   width: 100%;
   display: block;
   position: relative;
-  background: #f9fafb;
+  background-color: #f9fafb;
   img {
     object-fit: contain;
     width: 100%;
@@ -340,5 +394,12 @@ const SocialActions = styled.div`
         margin-left: 8px;
       }
     }
+  }
+`;
+
+const Content = styled.div`
+  text-align: center;
+  & > img {
+    width: 30px;
   }
 `;
